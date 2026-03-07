@@ -33,7 +33,10 @@ Long-term this may evolve into a NixOS-style declarative setup, but for now it t
 ./install.sh
 ```
 
-This backs up any existing files to `~/.dotfiles-backup/` before creating symlinks.
+The script does two things:
+
+1. **Installs dependencies** — git, zsh, starship, flatpak, Claude Code, Codex, and Gear Lever (via Flatpak).
+2. **Symlinks config files** — backs up any existing files to `~/.dotfiles-backup/` before creating symlinks.
 
 ## Conventions
 

@@ -4,6 +4,55 @@ set -euo pipefail
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
 
+# --- Dependencies ---
+
+install_deps() {
+    echo "=== Installing dependencies ==="
+    echo
+
+    # apt packages: git, zsh, flatpak
+    echo "apt packages..."
+    sudo apt update -y
+    sudo apt install -y git zsh flatpak
+
+    # Starship prompt
+    if ! command -v starship &>/dev/null; then
+        echo "Installing starship..."
+        curl -sS https://starship.rs/install.sh | sh -s -- -y
+    else
+        echo "starship already installed"
+    fi
+
+    # Claude Code
+    if ! command -v claude &>/dev/null; then
+        echo "Installing Claude Code..."
+        curl -fsSL https://claude.ai/install.sh | sh
+    else
+        echo "claude already installed"
+    fi
+
+    # Codex (via npm — requires node/npm)
+    if ! command -v codex &>/dev/null; then
+        echo "Installing Codex..."
+        npm install -g @openai/codex
+    else
+        echo "codex already installed"
+    fi
+
+    # Flatpak: add Flathub and install Gear Lever
+    echo "Setting up Flatpak + Gear Lever..."
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    flatpak install -y flathub it.mijorus.gearlever || true
+
+    echo
+    echo "=== Dependencies done ==="
+    echo
+}
+
+install_deps
+
+# --- Symlinks ---
+
 link_file() {
     local src="$1"
     local dest="$2"
