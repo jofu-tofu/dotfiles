@@ -1,0 +1,9 @@
+# Secrets and credentials
+.credentials.json
+*.key
+*.pem
+
+# Editor/OS junk
+.DS_Store
+*~
+*.swp

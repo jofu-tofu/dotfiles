@@ -1,0 +1,16 @@
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+personality = "pragmatic"
+project_doc_fallback_filenames = [ "CLAUDE.md" ]
+plan_mode_reasoning_effort = "xhigh"
+
+[notice.model_migrations]
+"gpt-5.2-codex" = "gpt-5.3-codex"
+
+[features]
+js_repl = true
+multi_agent = true
+prevent_idle_sleep = true
+
+[projects."/home/joshua-fu"]
+trust_level = "trusted"
