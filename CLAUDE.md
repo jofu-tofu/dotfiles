@@ -18,10 +18,12 @@ Long-term this may evolve into a NixOS-style declarative setup, but for now it t
 ├── home/                   # Dotfiles that go directly into ~/
 │   ├── .bashrc
 │   ├── .zshrc
+│   ├── .tmux.conf
 │   ├── .profile
 │   ├── .gitconfig
 │   └── .npmrc
 └── config/                 # Files for ~/.config/ and other ~/. directories
+    ├── starship.toml       # -> ~/.config/starship.toml
     ├── ghostty/config      # -> ~/.config/ghostty/config
     ├── claude/settings.json # -> ~/.claude/settings.json
     └── codex/config.toml   # -> ~/.codex/config.toml
@@ -35,13 +37,16 @@ Long-term this may evolve into a NixOS-style declarative setup, but for now it t
 
 The script does two things:
 
-1. **Installs dependencies** — git, zsh, starship, flatpak, Claude Code, Codex, and Gear Lever (via Flatpak).
+1. **Installs dependencies** — system packages (`ca-certificates`, `curl`, `git`, `nodejs`, `npm`, `zsh`, `tmux`, `flatpak`) first, then Starship, Claude Code, Codex, and Gear Lever (via Flatpak).
 2. **Symlinks config files** — backs up any existing files to `~/.dotfiles-backup/` before creating symlinks.
 
 ## Conventions
 
 - `bin/` entries are symlinked to `~/bin/` and are expected to be on `$PATH` (added by `.profile`).
 - `home/` entries are symlinked directly into `~/`.
-- `config/` entries map to their respective `~/.config/` or `~/.{name}/` directories.
-- When adding a new config file, place it in the appropriate directory and add a mapping in `install.sh`.
+- `config/` entries map automatically by top-level name:
+  - most entries go to `~/.config/{name}/...` or `~/.config/{file}`
+  - `config/claude/` maps to `~/.claude/`
+  - `config/codex/` maps to `~/.codex/`
+- When adding a new config file under `config/`, you only need to update `install.sh` if it belongs outside `~/.config/` and is not one of the existing special cases.
 - Do not commit secrets or credentials (`.credentials.json`, SSH keys, auth tokens).

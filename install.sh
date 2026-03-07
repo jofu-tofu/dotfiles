@@ -3,46 +3,84 @@ set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
+APT_PACKAGES=(ca-certificates curl flatpak git nodejs npm tmux zsh)
 
 # --- Dependencies ---
+
+install_apt_packages() {
+    echo "System packages..."
+    sudo apt update -y
+    sudo apt install -y "${APT_PACKAGES[@]}"
+}
+
+install_starship() {
+    if command -v starship &>/dev/null; then
+        echo "starship already installed"
+        return
+    fi
+
+    echo "Installing starship..."
+    curl -fsSL https://starship.rs/install.sh | sh -s -- -y
+}
+
+install_claude() {
+    if command -v claude &>/dev/null; then
+        echo "claude already installed"
+        return
+    fi
+
+    echo "Installing Claude Code..."
+    curl -fsSL https://claude.ai/install.sh | sh
+}
+
+install_codex() {
+    local npm_prefix
+
+    if command -v codex &>/dev/null; then
+        echo "codex already installed"
+        return
+    fi
+
+    echo "Installing Codex..."
+    npm_prefix="$(npm config get prefix 2>/dev/null || true)"
+
+    if [[ "$npm_prefix" == "$HOME"* ]]; then
+        npm install -g @openai/codex
+    else
+        sudo npm install -g @openai/codex
+    fi
+}
+
+install_bun() {
+    if command -v bun &>/dev/null; then
+        echo "bun already installed"
+        return
+    fi
+
+    echo "Installing Bun..."
+    curl -fsSL https://bun.sh/install | bash
+}
+
+install_flatpak_apps() {
+    echo "Setting up Flatpak + Gear Lever..."
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    flatpak install -y flathub it.mijorus.gearlever || true
+}
 
 install_deps() {
     echo "=== Installing dependencies ==="
     echo
 
-    # apt packages: git, zsh, flatpak
-    echo "apt packages..."
-    sudo apt update -y
-    sudo apt install -y git zsh flatpak
+    install_apt_packages
+    echo
 
-    # Starship prompt
-    if ! command -v starship &>/dev/null; then
-        echo "Installing starship..."
-        curl -sS https://starship.rs/install.sh | sh -s -- -y
-    else
-        echo "starship already installed"
-    fi
+    install_starship
+    install_bun
+    install_claude
+    install_codex
+    echo
 
-    # Claude Code
-    if ! command -v claude &>/dev/null; then
-        echo "Installing Claude Code..."
-        curl -fsSL https://claude.ai/install.sh | sh
-    else
-        echo "claude already installed"
-    fi
-
-    # Codex (via npm — requires node/npm)
-    if ! command -v codex &>/dev/null; then
-        echo "Installing Codex..."
-        npm install -g @openai/codex
-    else
-        echo "codex already installed"
-    fi
-
-    # Flatpak: add Flathub and install Gear Lever
-    echo "Setting up Flatpak + Gear Lever..."
-    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-    flatpak install -y flathub it.mijorus.gearlever || true
+    install_flatpak_apps
 
     echo
     echo "=== Dependencies done ==="
@@ -73,6 +111,52 @@ link_file() {
     echo "  linked $dest -> $src"
 }
 
+link_tree() {
+    local src_root="$1"
+    local dest_root="$2"
+    local src
+    local rel
+
+    while IFS= read -r -d '' src; do
+        rel="${src#$src_root/}"
+        link_file "$src" "$dest_root/$rel"
+    done < <(find "$src_root" -type f -print0)
+}
+
+link_config_entries() {
+    local entry
+    local name
+    local dest_root
+
+    for entry in "$DOTFILES_DIR"/config/*; do
+        [ -e "$entry" ] || continue
+
+        name="$(basename "$entry")"
+
+        case "$name" in
+            claude)
+                dest_root="$HOME/.claude"
+                ;;
+            codex)
+                dest_root="$HOME/.codex"
+                ;;
+            *)
+                dest_root="$HOME/.config/$name"
+                ;;
+        esac
+
+        echo "$name/"
+
+        if [ -d "$entry" ]; then
+            link_tree "$entry" "$dest_root"
+        else
+            link_file "$entry" "$dest_root"
+        fi
+
+        echo
+    done
+}
+
 echo "Installing dotfiles from $DOTFILES_DIR"
 echo
 
@@ -94,17 +178,6 @@ echo
 
 # ~/.config/ files
 echo "config/"
-link_file "$DOTFILES_DIR/config/ghostty/config" "$HOME/.config/ghostty/config"
-echo
-
-# ~/.claude/ files
-echo "claude/"
-link_file "$DOTFILES_DIR/config/claude/settings.json" "$HOME/.claude/settings.json"
-echo
-
-# ~/.codex/ files
-echo "codex/"
-link_file "$DOTFILES_DIR/config/codex/config.toml" "$HOME/.codex/config.toml"
-echo
+link_config_entries
 
 echo "Done."
