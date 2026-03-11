@@ -3,7 +3,7 @@ set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
-APT_PACKAGES=(ca-certificates curl flatpak git nodejs npm tmux zsh)
+APT_PACKAGES=(ca-certificates curl flatpak git nodejs npm python3 tmux zsh)
 
 # --- Dependencies ---
 
@@ -61,10 +61,21 @@ install_bun() {
     curl -fsSL https://bun.sh/install | bash
 }
 
+install_uv() {
+    if command -v uv &>/dev/null; then
+        echo "uv already installed"
+        return
+    fi
+
+    echo "Installing uv..."
+    env UV_NO_MODIFY_PATH=1 sh -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
+}
+
 install_flatpak_apps() {
     echo "Setting up Flatpak + Gear Lever..."
     flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
     flatpak install -y flathub it.mijorus.gearlever || true
+    flatpak install -y flathub md.obsidian.Obsidian || true
 }
 
 install_deps() {
@@ -76,6 +87,7 @@ install_deps() {
 
     install_starship
     install_bun
+    install_uv
     install_claude
     install_codex
     echo
@@ -139,6 +151,9 @@ link_config_entries() {
                 ;;
             codex)
                 dest_root="$HOME/.codex"
+                ;;
+            obsidian)
+                dest_root="$HOME/.var/app/md.obsidian.Obsidian/config/obsidian"
                 ;;
             *)
                 dest_root="$HOME/.config/$name"

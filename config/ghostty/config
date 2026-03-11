@@ -47,3 +47,20 @@
 # # which is explained in the docs for that config option.
 # # Just for example:
 # resize-overlay-duration = 4s 200ms
+
+# Splits
+keybind = ctrl+/=new_split:down
+keybind = ctrl+backslash=new_split:right
+keybind = ctrl+tab=goto_split:next
+keybind = ctrl+shift+w=close_surface
+keybind = ctrl+shift+x=toggle_split_zoom
+
+# Split resizing
+keybind = ctrl+shift+alt+h=resize_split:left,50
+keybind = ctrl+shift+alt+l=resize_split:right,50
+keybind = ctrl+shift+alt+k=resize_split:up,50
+keybind = ctrl+shift+alt+j=resize_split:down,50
+
+# Scrollback
+keybind = ctrl+home=scroll_to_top
+keybind = ctrl+end=scroll_to_bottom

@@ -127,3 +127,4 @@ fi
 
 export PATH="$HOME/.local/bin:$PATH"
 export SUDO_ASKPASS="$HOME/.local/bin/sudo-askpass.sh"
+. "$HOME/.cargo/env"

@@ -27,7 +27,8 @@ Long-term this may evolve into a NixOS-style declarative setup, but for now it t
     ├── starship.toml       # -> ~/.config/starship.toml
     ├── ghostty/config      # -> ~/.config/ghostty/config
     ├── claude/settings.json # -> ~/.claude/settings.json
-    └── codex/config.toml   # -> ~/.codex/config.toml
+    ├── codex/config.toml   # -> ~/.codex/config.toml
+    └── obsidian/obsidian.json # -> ~/.var/app/md.obsidian.Obsidian/config/obsidian/obsidian.json
 ```
 
 ## Install
@@ -38,7 +39,7 @@ Long-term this may evolve into a NixOS-style declarative setup, but for now it t
 
 The script does two things:
 
-1. **Installs dependencies** — system packages (`ca-certificates`, `curl`, `git`, `nodejs`, `npm`, `zsh`, `tmux`, `flatpak`) first, then Starship, Claude Code, Codex, and Gear Lever (via Flatpak).
+1. **Installs dependencies** — system packages (`ca-certificates`, `curl`, `git`, `nodejs`, `npm`, `python3`, `zsh`, `tmux`, `flatpak`) first, then Starship, Bun, uv, Claude Code, Codex, and Flatpak apps (Gear Lever, Obsidian).
 2. **Symlinks config files** — backs up any existing files to `~/.dotfiles-backup/` before creating symlinks.
 
 ## Conventions
@@ -49,5 +50,7 @@ The script does two things:
   - most entries go to `~/.config/{name}/...` or `~/.config/{file}`
   - `config/claude/` maps to `~/.claude/`
   - `config/codex/` maps to `~/.codex/`
+  - `config/obsidian/` maps to `~/.var/app/md.obsidian.Obsidian/config/obsidian/`
+- `uv` does not need a special-case symlink rule; if you add `config/uv/uv.toml`, it will map to `~/.config/uv/uv.toml` automatically. Do not commit `~/.config/uv/uv-receipt.json`; it is installer metadata.
 - When adding a new config file under `config/`, you only need to update `install.sh` if it belongs outside `~/.config/` and is not one of the existing special cases.
 - Do not commit secrets or credentials (`.credentials.json`, SSH keys, auth tokens).
