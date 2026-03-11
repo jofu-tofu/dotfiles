@@ -75,4 +75,47 @@ config.keys = {
   { key = 'w', mods = 'CTRL|SHIFT', action = wezterm.action_callback(close_pane_kill_tree) },
 }
 
+-- ── Appearance (matches Ghostty defaults) ─────────────────────────────
+
+-- Ghostty's default color palette
+config.colors = {
+  foreground = '#ffffff',
+  background = '#282c34',
+
+  ansi = {
+    '#1d1f21',  -- black
+    '#cc6666',  -- red
+    '#b5bd68',  -- green
+    '#f0c674',  -- yellow
+    '#81a2be',  -- blue
+    '#b294bb',  -- magenta
+    '#8abeb7',  -- cyan
+    '#c5c8c6',  -- white
+  },
+  brights = {
+    '#666666',  -- bright black
+    '#d54e53',  -- bright red
+    '#b9ca4a',  -- bright green
+    '#e7c547',  -- bright yellow
+    '#7aa6da',  -- bright blue
+    '#c397d8',  -- bright magenta
+    '#70c0b1',  -- bright cyan
+    '#eaeaea',  -- bright white
+  },
+}
+
+-- Font (Ghostty defaults to system monospace at 12pt)
+config.font_size = 12.0
+
+-- Window
+config.window_padding = {
+  left = 2,
+  right = 2,
+  top = 2,
+  bottom = 2,
+}
+
+-- Hide tab bar when only one tab is open
+config.hide_tab_bar_if_only_one_tab = true
+
 return config
