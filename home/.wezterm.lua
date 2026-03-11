@@ -1,17 +1,19 @@
 local wezterm = require 'wezterm'
 local config = wezterm.config_builder()
 
--- Launch zsh directly (skip bash intermediary for faster startup)
+-- On Windows there is no system login shell, so launch zsh explicitly.
 -- Using -i (interactive) instead of -l (login) to avoid Git for Windows'
 -- bash-specific /etc/profile.d scripts that break under zsh (shopt, etc.)
-config.default_prog = { 'C:\\Program Files\\Git\\usr\\bin\\zsh.exe', '-i' }
+local is_windows = wezterm.target_triple:find('windows') ~= nil
+if is_windows then
+  config.default_prog = { 'C:\\Program Files\\Git\\usr\\bin\\zsh.exe', '-i' }
+end
 
 -- Keep more terminal history and make wheel scrolling move further per tick.
 config.scrollback_lines = 50000
 config.alternate_buffer_wheel_scroll_speed = 5
 
 local act = wezterm.action
-local is_windows = wezterm.target_triple:find('windows') ~= nil
 
 -- Kill a pane's entire process tree (Windows), then close it.
 -- Prevents orphaned node.exe processes when closing REPL panes.
