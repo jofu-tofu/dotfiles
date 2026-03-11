@@ -19,6 +19,7 @@ Long-term this may evolve into a NixOS-style declarative setup, but for now it t
 │   ├── .bashrc
 │   ├── .zshrc
 │   ├── .tmux.conf
+│   ├── .wezterm.lua
 │   ├── .profile
 │   ├── .gitconfig
 │   └── .npmrc
