@@ -50,6 +50,7 @@ fi
 # Aliases
 alias cdx='aiw launch --codex'
 alias dvn='aiw launch --devin'
+alias wnd='windsurf'
 if command -v eza >/dev/null 2>&1; then
     alias ls='eza'
     alias ll='eza -la --git'
@@ -64,3 +65,6 @@ cd() {
     builtin cd "$@"
   fi
 }
+
+# Machine-specific overrides
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local

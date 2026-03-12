@@ -128,3 +128,6 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 export SUDO_ASKPASS="$HOME/.local/bin/sudo-askpass.sh"
 . "$HOME/.cargo/env"
+
+# Machine-specific overrides
+[[ -f ~/.bashrc.local ]] && source ~/.bashrc.local
