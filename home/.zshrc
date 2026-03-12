@@ -8,9 +8,6 @@ if [[ -z "$MSYSTEM" ]]; then
     [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
     export BUN_INSTALL="$HOME/.bun"
     export PATH="$BUN_INSTALL/bin:$PATH"
-else
-    # Strip PATH entries with spaces (e.g. "Program Files") from inherited Windows PATH
-    PATH=$(echo "$PATH" | tr ':' '\n' | grep -v ' ' | tr '\n' ':' | sed 's/:$//')
 fi
 
 # History
