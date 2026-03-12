@@ -118,4 +118,7 @@ config.window_padding = {
 -- Hide tab bar when only one tab is open
 config.hide_tab_bar_if_only_one_tab = true
 
+-- Source machine-local overrides (e.g. font_size, window settings)
+pcall(dofile, wezterm.home_dir .. '/.wezterm.local.lua')
+
 return config

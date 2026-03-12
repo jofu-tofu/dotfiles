@@ -26,3 +26,6 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 . "$HOME/.cargo/env"
+
+# Source machine-local overrides
+[ -f "$HOME/.profile.local" ] && . "$HOME/.profile.local"
