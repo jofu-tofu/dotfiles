@@ -12,5 +12,5 @@ js_repl = true
 multi_agent = true
 prevent_idle_sleep = true
 
-[projects."/home/joshua-fu"]
+[projects."{{HOME}}"]
 trust_level = "trusted"

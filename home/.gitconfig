@@ -3,9 +3,8 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
-[user]
-	name = jofu-tofu
-	email = 12winjosh@gmail.com
+[include]
+	path = ~/.gitconfig-user
 [credential "https://github.com"]
 	helper = 
 	helper = !/usr/bin/gh auth git-credential

@@ -101,6 +101,66 @@ install_deps() {
 
 install_deps
 
+# --- Templating ---
+
+# Files containing {{HOME}} need sed substitution instead of symlinks.
+# Generates the file in-place at the destination.
+TEMPLATE_FILES=(
+    "config/claude/settings.json"
+    "config/codex/config.toml"
+    "config/obsidian/obsidian.json"
+)
+
+template_file() {
+    local src="$1"
+    local dest="$2"
+
+    mkdir -p "$(dirname "$dest")"
+
+    if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+        mkdir -p "$BACKUP_DIR"
+        local backup_path="$BACKUP_DIR/${dest#$HOME/}"
+        mkdir -p "$(dirname "$backup_path")"
+        mv "$dest" "$backup_path"
+        echo "  backed up $dest -> $backup_path"
+    elif [ -L "$dest" ]; then
+        rm "$dest"
+    fi
+
+    sed "s|{{HOME}}|$HOME|g" "$src" > "$dest"
+    echo "  generated $dest (from template)"
+}
+
+is_template() {
+    local rel="$1"
+    for t in "${TEMPLATE_FILES[@]}"; do
+        if [ "$rel" = "$t" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+# --- Git identity ---
+
+setup_git_identity() {
+    if [ -f "$HOME/.gitconfig-user" ]; then
+        echo "~/.gitconfig-user already exists, skipping"
+        return
+    fi
+
+    echo "No ~/.gitconfig-user found. Setting up git identity..."
+    read -rp "  Git name: " git_name
+    read -rp "  Git email: " git_email
+
+    cat > "$HOME/.gitconfig-user" <<EOF
+[user]
+	name = $git_name
+	email = $git_email
+EOF
+    echo "  created ~/.gitconfig-user"
+}
+
 # --- Symlinks ---
 
 link_file() {
@@ -130,8 +190,13 @@ link_tree() {
     local rel
 
     while IFS= read -r -d '' src; do
-        rel="${src#$src_root/}"
-        link_file "$src" "$dest_root/$rel"
+        rel="${src#$DOTFILES_DIR/}"
+        local file_rel="${src#$src_root/}"
+        if is_template "$rel"; then
+            template_file "$src" "$dest_root/$file_rel"
+        else
+            link_file "$src" "$dest_root/$file_rel"
+        fi
     done < <(find "$src_root" -type f -print0)
 }
 
@@ -165,7 +230,12 @@ link_config_entries() {
         if [ -d "$entry" ]; then
             link_tree "$entry" "$dest_root"
         else
-            link_file "$entry" "$dest_root"
+            local rel="config/$name"
+            if is_template "$rel"; then
+                template_file "$entry" "$dest_root"
+            else
+                link_file "$entry" "$dest_root"
+            fi
         fi
 
         echo
@@ -194,5 +264,10 @@ echo
 # ~/.config/ files
 echo "config/"
 link_config_entries
+
+# Git identity
+echo "git identity/"
+setup_git_identity
+echo
 
 echo "Done."
