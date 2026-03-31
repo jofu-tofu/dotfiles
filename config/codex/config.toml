@@ -1,5 +1,5 @@
 model = "gpt-5.4"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "medium"
 personality = "pragmatic"
 project_doc_fallback_filenames = [ "CLAUDE.md" ]
 plan_mode_reasoning_effort = "xhigh"
@@ -14,3 +14,6 @@ prevent_idle_sleep = true
 
 [projects."{{HOME}}"]
 trust_level = "trusted"
+
+[plugins."github@openai-curated"]
+enabled = true

@@ -128,7 +128,13 @@ template_file() {
     fi
 
     sed "s|{{HOME}}|$HOME|g" "$src" > "$dest"
-    echo "  generated $dest (from template)"
+    local local_file="${src}.local"
+    if [ -f "$local_file" ]; then
+        cat "$local_file" >> "$dest"
+        echo "  generated $dest (from template + .local)"
+    else
+        echo "  generated $dest (from template)"
+    fi
 }
 
 is_template() {
@@ -190,6 +196,7 @@ link_tree() {
     local rel
 
     while IFS= read -r -d '' src; do
+        [[ "$src" == *.local ]] && continue
         rel="${src#$DOTFILES_DIR/}"
         local file_rel="${src#$src_root/}"
         if is_template "$rel"; then
@@ -257,7 +264,24 @@ echo
 echo "home/"
 for f in "$DOTFILES_DIR"/home/.*; do
     [ -f "$f" ] || continue
-    link_file "$f" "$HOME/$(basename "$f")"
+    [[ "$f" == *.local ]] && continue
+    local_file="${f}.local"
+    if [ -f "$local_file" ]; then
+        dest="$HOME/$(basename "$f")"
+        mkdir -p "$BACKUP_DIR" 2>/dev/null || true
+        if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+            backup_path="$BACKUP_DIR/${dest#$HOME/}"
+            mkdir -p "$(dirname "$backup_path")"
+            mv "$dest" "$backup_path"
+            echo "  backed up $dest -> $backup_path"
+        elif [ -L "$dest" ]; then
+            rm "$dest"
+        fi
+        cat "$f" "$local_file" > "$dest"
+        echo "  merged $dest (repo + .local)"
+    else
+        link_file "$f" "$HOME/$(basename "$f")"
+    fi
 done
 echo
 

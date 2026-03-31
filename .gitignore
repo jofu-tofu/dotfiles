@@ -6,6 +6,9 @@
 # Machine-specific identity (created per-machine, not tracked)
 home/.gitconfig-user
 
+# Machine-local overrides (secrets, tokens, device-specific config)
+*.local
+
 # Editor/OS junk
 .DS_Store
 *~
