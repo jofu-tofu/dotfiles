@@ -1,3 +1,9 @@
+# Ensure MSYS2 core paths are available (may be missing if zsh bypasses .bashrc)
+if [[ -d /usr/bin ]]; then
+    path=(/usr/local/bin /usr/bin /mingw64/bin $path)
+    typeset -U path
+fi
+
 # Linux-only environment (Windows env is set in .bashrc before exec zsh)
 if [[ -z "$MSYSTEM" ]]; then
     export NVM_DIR="$HOME/.nvm"

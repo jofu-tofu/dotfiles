@@ -9,8 +9,17 @@ if is_windows then
   config.default_prog = { 'C:\\Program Files\\Git\\usr\\bin\\zsh.exe', '-i' }
 end
 
+-- ── Performance tuning (Windows) ──────────────────────────────────────
+-- Force OpenGL to avoid WebGpu input lag bugs on Windows 11 (#4278, #3122)
+config.front_end = 'OpenGL'
+-- Kill animations and cursor blink to save GPU cycles
+config.animation_fps = 1
+config.cursor_blink_rate = 0
+-- Disable IME if you don't need CJK input methods
+config.use_ime = false
+
 -- Keep more terminal history and make wheel scrolling move further per tick.
-config.scrollback_lines = 50000
+config.scrollback_lines = 10000
 config.alternate_buffer_wheel_scroll_speed = 5
 
 local act = wezterm.action
